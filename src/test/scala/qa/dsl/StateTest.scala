@@ -2,12 +2,13 @@ package qa.dsl
 
 import qa.Test
 import qa.dsl.ApproximateStateMatcher.approximatelyEqualState
+import scala.collection.immutable.{Vector => StdVector}
 
 class StateTest extends Test {
 
   "The simplest SingularState" should "be constructed by multiplying it with a Double" in {
     val simplestState = 0.5 * State(0)
-    simplestState should approximatelyEqualState (SingularState(0.5, Vector(0)))
+    simplestState should approximatelyEqualState (SingularState(0.5, StdVector(0)))
   }
 
   "Adding a SingularState with the same Qubits" should "add coefficients" in {
@@ -20,7 +21,7 @@ class StateTest extends Test {
     val s1 = State(0)
     val s2 = State(1)
 
-    s1 + s2 should approximatelyEqualState (CompositeState(s1, s2))
+    s1 + s2 should approximatelyEqualState (SuperposedState(s1, s2))
   }
 
   "Adding States with different numbers of Qubits" should "not work" in {
@@ -39,6 +40,11 @@ class StateTest extends Test {
     intercept[IllegalArgumentException] {
       State(5)
     }
+  }
+
+  "Tensoring two SingularStates" should "produce a new SingularState with more Qubits" in {
+    SingularState(1, StdVector(0)) ⊗ SingularState(1, StdVector(1)) should approximatelyEqualState(SingularState(1, StdVector(0, 1)))
+    // TODO: Check coefficients
   }
 
   // TODO: Unallowed operations (different sizes etc.)

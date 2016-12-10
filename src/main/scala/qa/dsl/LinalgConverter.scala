@@ -5,30 +5,61 @@ import scala.collection.immutable.{Vector => StdVector}
 
 object LinalgConverter {
 
-  val zeroElementRegardingTensorProduct = Vector(1)
+  val zeroElementVector = Vector(1)
+  val zeroElementState = SingularState(1, StdVector.empty)
 
   def toVector(s: State): Vector = {
     s match {
       case ss: SingularState => singularStateToVector(ss)
-      case cs: CompositeState => compositeStateToVector(cs)
+      case cs: SuperposedState => compositeStateToVector(cs)
     }
   }
 
   def toState(v: Vector): State = {
-    val numberOfQubits = lg2Unsafe(v.entries.size)
+    val vectors = for {
+      (d, i) <- v.entries.zipWithIndex
+      if 0 != d
+    } yield (d, UnitVector(dimensions = v.entries.size, index = i))
 
-    val zeroState = StdVector.fill[Double](numberOfQubits)(0)
+    val mappedToSingularQubitStates = vectors
+      .map{ case (coeff, v) => coeff * partializeVector(v).map(twoDimVectorToSingularState).foldLeft(zeroElementState)(_ ⊗ _)}
 
-    ???
+    SuperposedState(mappedToSingularQubitStates: _*)
+  }
+
+  private def partializeVector(v: Vector, alreadyFound: List[Vector] = List.empty): List[Vector] = {
+    val lowerHalfsFirstIndex = v.entries.size / 2
+    val indexOfNonZeroElement = v.entries.indexWhere(_ != 0)
+
+    val singleQubitVector = if(indexOfNonZeroElement < lowerHalfsFirstIndex)
+      Vector(1, 0)
+    else
+      Vector(0, 1)
+
+    val remainingVector = if(indexOfNonZeroElement < lowerHalfsFirstIndex)
+      v.entries.slice(0, lowerHalfsFirstIndex)
+    else
+      v.entries.slice(lowerHalfsFirstIndex, v.entries.size)
+
+    if(remainingVector.size < 2)
+      singleQubitVector :: alreadyFound
+    else
+      singleQubitVector :: partializeVector(Vector(remainingVector), alreadyFound)
+  }
+
+  private def twoDimVectorToSingularState(v: Vector): SingularState = {
+    val indexOfNonZeroElement = v.entries.indexWhere(_ != 0)
+
+    SingularState(coefficient = v.entries(indexOfNonZeroElement), qubits = StdVector(indexOfNonZeroElement))
   }
 
   private def singularStateToVector(s: SingularState): Vector = {
-    val tensoredUnitVectors = s.qubits.map(qubitToUnitVector).foldLeft(zeroElementRegardingTensorProduct)(_ ⊗ _)
+    val tensoredUnitVectors = s.qubits.map(qubitToUnitVector).foldLeft(zeroElementVector)(_ ⊗ _)
 
     s.coefficient * tensoredUnitVectors
   }
 
-  private def compositeStateToVector(s: CompositeState): Vector = {
+  private def compositeStateToVector(s: SuperposedState): Vector = {
     s.states.map(singularStateToVector).reduce(_ + _)
   }
 
@@ -37,6 +68,7 @@ object LinalgConverter {
   }
 
   private def lg2Unsafe(i: Int): Int = {
+    // TODO: Make safe
     (math.log(i) / math.log(2)).round.toInt
   }
 

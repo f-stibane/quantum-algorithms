@@ -18,9 +18,9 @@ class LinalgConverterTest extends Test {
     LinalgConverter.toVector(s) should approximatelyEqualVector (Vector(0, 0.3, 0.5, 0))
   }
 
-//  "Converting a Vector with exactly one non-zero entry to a State" should "result in a SingularState" in {
-//    val v = Vector(0, 0.3, 0, 0)
-//    LinalgConverter.toState(v) should approximatelyEqualState (SingularState(0.3, StdVector(0, 1)))
-//  }
+  "Converting a Vector with exactly one non-zero entry to a State" should "result in a SingularState" in {
+    val v = Vector(0, 0.3, 0, 0)
+    LinalgConverter.toState(v) should approximatelyEqualState (SingularState(0.3, StdVector(0, 1)))
+  }
 
 }

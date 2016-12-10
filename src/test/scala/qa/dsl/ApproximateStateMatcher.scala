@@ -10,7 +10,7 @@ object ApproximateStateMatcher {
       val equals = (left, right) match {
         case (l: SingularState, r: SingularState) =>
           approximatelyEquals(l, r)
-        case (l: CompositeState, r: CompositeState) =>
+        case (l: SuperposedState, r: SuperposedState) =>
           l.states.size == r.states.size && l.states.forall{ lss =>
             r.states.exists(approximatelyEquals(_, lss))
           }
