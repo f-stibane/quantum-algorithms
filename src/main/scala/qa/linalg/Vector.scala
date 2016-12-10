@@ -4,6 +4,12 @@ import scala.collection.immutable.{Vector => StdVector}
 
 case class Vector(entries: StdVector[Double]) {
 
+  def +(other: Vector): Vector = {
+    val addedEntries = entries.indices.map(i => entries(i) + other.entries(i))
+
+    Vector(addedEntries: _*)
+  }
+
   def *(d: Double) = Vector(entries.map(_ * d): _*)
 
   def ⊗(other: Vector): Vector = {

@@ -1,13 +1,20 @@
 package qa.linalg
 
-import org.scalatest.{FlatSpec, Matchers}
+import qa.Test
 
-class VectorTest extends FlatSpec with Matchers {
+class VectorTest extends Test {
 
   "Creating a UnitVector" should "create a Vector with exactly one 1, rest are 0s" in {
     val uv = UnitVector(dimensions = 4, index = 1)
 
     uv shouldEqual Vector(0, 1, 0, 0)
+  }
+
+  "Adding two Vectors" should "add the entries" in {
+    val v1 = Vector(0, 1, 2, 3)
+    val v2 = Vector(1, 2, 3, 4)
+
+    v1 + v2 shouldEqual Vector(1, 3, 5, 7)
   }
 
   "Multiplying a Vector with a Double" should "multiply all its entries" in {
@@ -23,5 +30,7 @@ class VectorTest extends FlatSpec with Matchers {
     uv0 ⊗ uv1 shouldEqual UnitVector(dimensions = 4, index = 1)
     uv1 ⊗ uv0 shouldEqual UnitVector(dimensions = 4, index = 2)
   }
+
+  // TODO: Unallowed operations (different sizes etc.)
 
 }

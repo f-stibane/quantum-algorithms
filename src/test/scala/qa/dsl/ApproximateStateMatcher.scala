@@ -1,16 +1,9 @@
 package qa.dsl
 
-import org.scalatest.{FlatSpec, Matchers}
 import org.scalatest.matchers.{MatchResult, Matcher}
+import qa.{ApproximateDoubleMatcher, Test}
 
-object ApproximateMatchers {
-  val precision = 1e-6
-
-  def approximatelyEquals(l: Double, r: Double): Boolean = (l - r).abs < precision
-  def approximatelyEquals(l: SingularState, r: SingularState): Boolean =
-    approximatelyEquals(l.coefficient, r.coefficient) && l.qubits == r.qubits
-
-  def approximatelyEqual(right: State): StateApproximatelyEquals = new StateApproximatelyEquals(right)
+object ApproximateStateMatcher {
 
   class StateApproximatelyEquals(right: State) extends Matcher[State] {
     override def apply(left: State): MatchResult = {
@@ -32,21 +25,26 @@ object ApproximateMatchers {
       )
     }
   }
+
+  def approximatelyEqualState(right: State): StateApproximatelyEquals = new StateApproximatelyEquals(right)
+
+  def approximatelyEquals(l: SingularState, r: SingularState): Boolean =
+    ApproximateDoubleMatcher.approximatelyEquals(l.coefficient, r.coefficient) && l.qubits == r.qubits
 }
 
-class ApproximateMatchersTest extends FlatSpec with Matchers {
-  import ApproximateMatchers._
+class ApproximateStateMatcherTest extends Test {
+  import ApproximateStateMatcher._
 
   "Two States with really small differences in their coefficients" should "be approximately equal" in {
     val something = 42 * State(0)
-    val somethingSlightlyLarger = (42 + 0.5 * precision) * State(0)
-    something should approximatelyEqual (somethingSlightlyLarger)
+    val somethingSlightlyLarger = (42 + 0.5 * ApproximateDoubleMatcher.precision) * State(0)
+    something should approximatelyEqualState (somethingSlightlyLarger)
   }
 
   "Two States with considerable differences in their coefficients" should "not be approximately equal" in {
     val something = 42 * State(0)
     val somethingMuchLarger = 99 * State(0)
-    something shouldNot approximatelyEqual (somethingMuchLarger)
+    something shouldNot approximatelyEqualState (somethingMuchLarger)
   }
 
 }
