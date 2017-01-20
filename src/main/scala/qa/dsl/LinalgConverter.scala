@@ -67,8 +67,7 @@ object LinalgConverter {
     UnitVector(dimensions = 2, index = qubit)
   }
 
-  private def lg2Unsafe(i: Int): Int = {
-    // TODO: Make safe
+  private def lg2Rounded(i: Int): Int = {
     (math.log(i) / math.log(2)).round.toInt
   }
 
