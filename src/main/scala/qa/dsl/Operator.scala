@@ -1,9 +1,12 @@
 package qa.dsl
 
 import qa.linalg.Matrix
+
 import scala.collection.immutable.{Vector => StdVector}
 
 trait Operator {
+  import qa.dsl.Operator.I
+
   def apply(s: State): State = {
     val matrices = for {
       _ <- 0 until s.numberOfQubits
@@ -14,6 +17,22 @@ trait Operator {
     val applied = tensored * LinalgConverter.toVector(s)
     LinalgConverter.toState(applied)
   }
+
+  def apply(selectedQubits: Int*)(s: State): State = {
+    val matrices = for {
+      i <- 0 until s.numberOfQubits
+    } yield {
+      if(selectedQubits.contains(i))
+        matrix
+      else
+        I.matrix
+    }
+    val tensored = matrices.reduce(_ ⊗ _)
+
+    val applied = tensored * LinalgConverter.toVector(s)
+    LinalgConverter.toState(applied)
+  }
+
   protected def matrix: Matrix
 }
 

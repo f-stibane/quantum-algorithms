@@ -60,4 +60,9 @@ class OperatorTest extends Test {
 
   // TODO: Property-based test - Z Operator
 
+  "Applying an Operator only on selected Qubits" should "change only those" in {
+    val s = State(0, 0, 0)
+    X(0, 2)(s) should approximatelyEqual (State(1, 0, 1))
+  }
+
 }
