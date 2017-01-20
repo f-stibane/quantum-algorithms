@@ -7,6 +7,7 @@ sealed trait State {
   final def +(other: State): State = {
     SuperposedState(this, other)
   }
+  def numberOfQubits: Int
 }
 
 object State {
@@ -27,6 +28,8 @@ private[dsl] class SingularState private (val coefficient: Double, val qubits: S
   override def toString: String = {
     s"$coefficient|${qubits.mkString(",")}>"
   }
+
+  override def numberOfQubits = qubits.length
 }
 
 object SingularState {
@@ -39,9 +42,11 @@ object SingularState {
 }
 
 private[dsl] class SuperposedState private(val states: SingularState*) extends State {
-  override def *(d: Double): SuperposedState = ???
+  override def *(d: Double): SuperposedState = new SuperposedState(states.map(_ * d): _*)
 
   override def toString: String = s"${states.mkString(" + ")}"
+
+  override def numberOfQubits = states.head.numberOfQubits
 }
 
 object SuperposedState {
