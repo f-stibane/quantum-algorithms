@@ -1,7 +1,5 @@
 package qa.dsl
 
-import com.sun.xml.internal.xsom.XSWildcard.Other
-
 import scala.collection.immutable.{Vector => StdVector}
 
 sealed trait State {
