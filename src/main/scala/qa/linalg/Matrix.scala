@@ -26,10 +26,10 @@ case class Matrix(rows: Int, cols: Int, entries: StdVector[Double]) {
       r <- 0 until rows * other.rows
       c <- 0 until cols * other.cols
     } yield {
-      val leftR = r % rows
-      val leftC = c % cols
-      val rightR = r / rows
-      val rightC = c / cols
+      val leftR = r / other.rows
+      val leftC = c / other.cols
+      val rightR = r % other.rows
+      val rightC = c % other.cols
 
       entries(leftR * cols + leftC) * other.entries(rightR * other.cols + rightC)
     }

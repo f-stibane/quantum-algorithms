@@ -21,6 +21,8 @@ case class Vector(entries: StdVector[Double]) {
     new Vector(newVectorsEntries)
   }
 
+  override def toString: String = entries.toString
+
 }
 
 object Vector {
