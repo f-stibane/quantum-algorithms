@@ -1,4 +1,6 @@
-package qa
+package qa.linalg
+
+import qa.Test
 
 object ApproximateDoubleMatcher {
   val precision = 1e-6

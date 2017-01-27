@@ -1,7 +1,8 @@
 package qa.dsl
 
 import org.scalatest.matchers.{MatchResult, Matcher}
-import qa.{ApproximateDoubleMatcher, Test}
+import qa.Test
+import qa.linalg.ApproximateDoubleMatcher
 
 object ApproximateStateMatcher {
 

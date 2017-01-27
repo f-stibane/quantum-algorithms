@@ -1,7 +1,7 @@
 package qa.linalg
 
 import org.scalatest.matchers.{MatchResult, Matcher}
-import qa.{ApproximateDoubleMatcher, Test}
+import qa.Test
 
 object ApproximateVectorMatcher {
 
