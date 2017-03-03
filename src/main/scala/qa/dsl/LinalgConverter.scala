@@ -11,7 +11,7 @@ object LinalgConverter {
   def toVector(s: State): Vector = {
     s match {
       case ss: SingularState => singularStateToVector(ss)
-      case cs: SuperposedState => compositeStateToVector(cs)
+      case ss: SuperposedState => compositeStateToVector(ss)
     }
   }
 
@@ -21,12 +21,15 @@ object LinalgConverter {
       if 0 != d
     } yield (d, UnitVector(dimensions = v.entries.size, index = i))
 
-    val mappedToSingularQubitStates = vectors
-      .map{ case (coeff, v) => coeff * partializeVector(v).map(twoDimVectorToSingularState).foldLeft(zeroElementState)(_ ⊗ _)}
+    val mappedToSingularQubitStates =
+      vectors.map{ case (coeff, v) =>
+        coeff * partializeVector(v).map(twoDimVectorToSingularState).foldLeft(zeroElementState)(_ ⊗ _)
+      }
 
     SuperposedState(mappedToSingularQubitStates: _*)
   }
 
+  // TODO: Make tail recursive - accumulated state as parameter
   private def partializeVector(v: Vector, alreadyFound: List[Vector] = List.empty): List[Vector] = {
     val lowerHalfsFirstIndex = v.entries.size / 2
     val indexOfNonZeroElement = v.entries.indexWhere(_ != 0)
