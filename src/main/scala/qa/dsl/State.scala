@@ -1,13 +1,20 @@
 package qa.dsl
 
 import scala.collection.immutable.{Vector => StdVector}
+import scala.util.Random
 
 sealed trait State {
+  def measureSingleQubit(index: Int)(implicit random: Random = new Random()): (Int, State)
+
   def *(d: Double): State
   final def +(other: State): State = {
     SuperposedState(this, other)
   }
   def numberOfQubits: Int
+
+  def ⊗(other: State): State = ???
+  def inspectQubit(index: Int): State = ???
+  def probability: Double
 }
 
 object State {
@@ -30,6 +37,12 @@ private[dsl] class SingularState private (val coefficient: Double, val qubits: S
   }
 
   override def numberOfQubits = qubits.length
+
+  override def measureSingleQubit(index: Int)(implicit random: Random = new Random()): (Int, State) = {
+    (qubits(index), this)
+  }
+
+  override def probability: Double = coefficient * coefficient
 }
 
 object SingularState {
@@ -47,6 +60,32 @@ private[dsl] class SuperposedState private(val states: SingularState*) extends S
   override def toString: String = s"${states.mkString(" + ")}"
 
   override def numberOfQubits = states.head.numberOfQubits
+
+  override def measureSingleQubit(index: Int)(implicit random: Random = new Random()): (Int, State) = {
+    val groupedByQubit = states.groupBy(_.qubits(index))
+    val prob0 = new SuperposedState(groupedByQubit(0): _*).probability
+    val rolled = random.nextDouble()
+
+    if(rolled < prob0) {
+      (0, new SuperposedState(normalizeTo(groupedByQubit(0), probability): _*).reduced)
+    } else {
+      (1, new SuperposedState(normalizeTo(groupedByQubit(1), probability): _*).reduced)
+    }
+  }
+
+  def normalizeTo(statesToNormalize: Seq[SingularState], toNormalizeTo: Double): Seq[SingularState] = {
+    val originalProbability = probability(statesToNormalize)
+    val factor = math.sqrt(toNormalizeTo / originalProbability)
+    statesToNormalize.map(s => SingularState(s.coefficient * factor, s.qubits))
+  }
+
+  override def probability: Double = probability(states)
+  private def probability(states: Seq[SingularState]): Double = states.map(_.probability).sum
+
+  def reduced: State = {
+    if(1 == states.size) states.head
+    else this
+  }
 }
 
 object SuperposedState {

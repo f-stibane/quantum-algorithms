@@ -2,7 +2,9 @@ package qa.dsl
 
 import qa.Test
 import qa.dsl.ApproximateStateMatcher.approximatelyEqual
+
 import scala.collection.immutable.{Vector => StdVector}
+import scala.util.Random
 
 class StateTest extends Test {
 
@@ -45,6 +47,25 @@ class StateTest extends Test {
   "Tensoring two SingularStates" should "produce a new SingularState with more Qubits" in {
     SingularState(1, StdVector(0)) ⊗ SingularState(1, StdVector(1)) should approximatelyEqual(SingularState(1, StdVector(0, 1)))
     // TODO: Check coefficients
+  }
+
+  //TODO: Property-based test
+  "Measuring on a SingularState" should "return the state itself" in {
+    val orig = State(1)
+    val (measured, remainingState) = orig.measureSingleQubit(0)
+    measured shouldEqual 1
+    remainingState should approximatelyEqual(orig)
+  }
+
+  "Measuring 0 on a SuperposedState" should "only select the 0-states and normalize coefficients" in {
+    implicit val random0_3 = new Random() {
+      override def nextDouble(): Double = 0.3
+    }
+
+    val orig = (1 / math.sqrt(2)) * (State(0) + State(1))
+    val (measured, remainingState) = orig.measureSingleQubit(0)
+    measured shouldEqual 0
+    remainingState should approximatelyEqual(State(0))
   }
 
   // TODO: Unallowed operations (different sizes etc.)
