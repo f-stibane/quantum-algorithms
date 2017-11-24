@@ -31,6 +31,10 @@ class VectorTest extends Test {
     uv1 ⊗ uv0 shouldEqual UnitVector(dimensions = 4, index = 2)
   }
 
+  "Vector(0.4, 0) ⊗ Vector(0, 0.5)" should "equal Vector(0, 0.2, 0, 0)" in {
+    Vector(0.4, 0) ⊗ Vector(0, 0.5) shouldEqual Vector(0, 0.2, 0, 0)
+  }
+
   // TODO: Unallowed operations (different sizes etc.)
 
 }

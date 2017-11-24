@@ -68,6 +68,17 @@ class StateTest extends Test {
     remainingState should approximatelyEqual(State(0))
   }
 
+  "|0> ⊗ |1>" should "equal |0, 1>" in {
+    State(0) ⊗ State(1) should approximatelyEqual(State(0, 1))
+  }
+
+  "A more complex tensor product" should "also work" in {
+    val a = 0.4 * State(1, 0)
+    val b = 0.5 * State(0, 1)
+
+    a ⊗ b should approximatelyEqual(0.2 * State(1, 0, 0, 1))
+  }
+
   // TODO: Unallowed operations (different sizes etc.)
 
 }

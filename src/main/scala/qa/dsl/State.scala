@@ -12,7 +12,7 @@ sealed trait State {
   }
   def numberOfQubits: Int
 
-  def ⊗(other: State): State = ???
+  def ⊗(other: State): State = LinalgConverter.toState(LinalgConverter.toVector(this) ⊗ LinalgConverter.toVector(other))
   def inspectQubit(index: Int): State = ???
   def probability: Double
 }
