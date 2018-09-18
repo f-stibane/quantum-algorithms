@@ -1,0 +1,7 @@
+pipeline:
+  test:
+    image: scalaplatform/scala:0.5
+    commands:
+      - sbt test
+
++branches: drone
