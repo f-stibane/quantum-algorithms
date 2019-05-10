@@ -67,6 +67,8 @@ object State {
           for (subState <- state.states)
             consolidated += subState
         }
+
+        case _ => throw new IllegalArgumentException("Unknown state: " + state)
       }
     }
 
