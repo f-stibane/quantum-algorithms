@@ -1,9 +1,7 @@
 lazy val commonSettings = Seq(
   organization := "qa",
   version := "0.1",
-  scalaVersion := "2.11.8",
-
-  dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "1.0.5",
+  scalaVersion := "2.12.8",
 
   updateOptions := updateOptions.value.withCachedResolution(true)
 )
@@ -16,7 +14,7 @@ lazy val core = (project in file("core"))
   .settings(commonSettings: _*)
   .settings(
     libraryDependencies ++= Seq(
-      "org.scalatest" %% "scalatest" % "3.0.0" % Test,
+      "org.scalatest" %% "scalatest" % "3.0.5" % Test,
       "org.mockito" % "mockito-all" % "1.10.19" % Test
     )
   )
